@@ -1,0 +1,15 @@
+{
+  "name": "mpeg-viewer",
+  "version": "1.0.0",
+  "description": "A video viewer clone like youtube",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "youtube"
+  ],
+  "author": "Mahad Saffi",
+  "license": "ISC"
+}
