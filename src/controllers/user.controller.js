@@ -1,7 +1,7 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from "../utils/ApiError.js";
 import {User} from "../models/user.models.js";
-import {uploadOnCloudinary} from "../utils/cloudinary.js";
+import {uploadOnCloudinary, deleteFromCoudinary} from "../utils/cloudinary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken';
 
@@ -268,8 +268,13 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     if (!avatarPath) {
         throw new (400, "Avatar path is missing")
     }
-
+    
+    //uploading new file on cloudinary
     const avatar = await uploadOnCloudinary(avatarPath);
+
+    //deleting file from cloudinary
+    const isFileDeleted = await deleteFromCoudinary(req.user?.avatar)
+    if (isFileDeleted !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -306,7 +311,12 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         throw new (400, "Avatar path is missing")
     }
 
+    //uploading new file on cloudinary
     const coverImage = await uploadOnCloudinary(coverImagePath);
+
+     //deleting file from cloudinary
+     const isFileDeleted = await deleteFromCoudinary(req.user?.avatar)
+     if (isFileDeleted !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
