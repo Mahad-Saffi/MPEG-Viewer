@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { response } from 'express';
 import fs from 'fs';
-import ApiError from './ApiError';
+import ApiError from './ApiError.js';
 
 
 cloudinary.config({ 
@@ -22,20 +22,23 @@ function extractPublicId(url) {
     return null;
 }
 
-export const deleteFromCoudinary = async (url) => {
+export const deleteFromCloudinary = async (url) => {
     const publicId = extractPublicId(url);
 
-    try {
-        await cloudinary.uploader.destroy(publicId, {
-            resource_type: "auto"
-        })
-        .then(result => {return result})
-        .catch((err) => {
-            throw new ApiError(500, err?.message || "something went wrong while deleting file from cloudinary")
-        })
-    } catch (error) {
-        throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
+    if (!publicId) {
+        throw new ApiError(400, "Invalid URL or public ID could not be extracted");
     }
+
+    try {
+        const result = await cloudinary.uploader.destroy(publicId, {
+            resource_type: "image"
+        });
+        
+        return result;
+    } catch (error) {
+        throw new ApiError(500, error?.message || "Something went wrong while deleting file from Cloudinary");
+    }
+
 }
 
 

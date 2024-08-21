@@ -1,10 +1,10 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from "../utils/ApiError.js";
 import {User} from "../models/user.models.js";
-import {uploadOnCloudinary, deleteFromCoudinary} from "../utils/cloudinary.js";
+import {uploadOnCloudinary, deleteFromCloudinary} from "../utils/cloudinary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken';
-import { mongo } from 'mongoose';
+import { mongoose } from 'mongoose';
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -148,8 +148,8 @@ const logoutUser = asyncHandler (async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             }
         },
         {
@@ -197,7 +197,7 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
             secure: true
         }
     
-        const {accessToken, newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
+        const {accessToken, newRefreshToken} = await generateAccessAndRefreshToken(user._id)
     
         return res
         .status(200)
@@ -207,8 +207,9 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
             new ApiResponse(200, {
                 accessToken,
                 refreshToken: newRefreshToken,
-            }),
+            },
             "Access token refreshed successfully"
+        )
         )
     
     } catch (error) {
@@ -274,8 +275,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatar = await uploadOnCloudinary(avatarPath);
 
     //deleting file from cloudinary
-    const isFileDeleted = await deleteFromCoudinary(req.user?.avatar)
-    if (isFileDeleted !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
+    const isFileDeleted = await deleteFromCloudinary(req.user?.avatar)
+    if (isFileDeleted.result !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -316,8 +317,8 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImage = await uploadOnCloudinary(coverImagePath);
 
      //deleting file from cloudinary
-     const isFileDeleted = await deleteFromCoudinary(req.user?.avatar)
-     if (isFileDeleted !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
+     const isFileDeleted = await deleteFromCloudinary(req.user?.coverImage)
+     if (isFileDeleted.result !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -385,7 +386,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
                     $size: "$subscribedTo"
                 },
                 isSubscribed: {
-                    $condition: {
+                    $cond: {
                         if: {$in: [req.user?._id, "$subscribers.subscriber"]},
                         then: true,
                         else: false,
@@ -410,8 +411,6 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
     if (!channel?.length) {
         throw new ApiError(404, "channel does not exist")
     }
-
-    console.log(channel);
 
     return res
     .status(200)
@@ -462,10 +461,10 @@ const getWatchedHistory = asyncHandler(async(req, res) => {
             }
         },
         {
-            $first: {
-                watchHistory: "$watchHistory"
+            $project: {
+                watchHistory: 1
             }
-        },
+        }
     ])
 
     return res
