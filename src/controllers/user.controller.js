@@ -56,7 +56,6 @@ const registerUser = asyncHandler( async (req, res) => {
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
     
 
     if (!avatar) {
@@ -275,7 +274,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatar = await uploadOnCloudinary(avatarPath);
 
     //deleting file from cloudinary
-    const isFileDeleted = await deleteFromCloudinary(req.user?.avatar)
+    const isFileDeleted = await deleteFromCloudinary(req.user?.avatar, "image")
     if (isFileDeleted.result !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
     const user = await User.findByIdAndUpdate(
@@ -317,7 +316,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImage = await uploadOnCloudinary(coverImagePath);
 
      //deleting file from cloudinary
-     const isFileDeleted = await deleteFromCloudinary(req.user?.coverImage)
+     const isFileDeleted = await deleteFromCloudinary(req.user?.coverImage, "image")
      if (isFileDeleted.result !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
     const user = await User.findByIdAndUpdate(

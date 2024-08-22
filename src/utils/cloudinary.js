@@ -22,7 +22,7 @@ function extractPublicId(url) {
     return null;
 }
 
-export const deleteFromCloudinary = async (url) => {
+export const deleteFromCloudinary = async (url, resourceType) => {
     const publicId = extractPublicId(url);
 
     if (!publicId) {
@@ -31,7 +31,7 @@ export const deleteFromCloudinary = async (url) => {
 
     try {
         const result = await cloudinary.uploader.destroy(publicId, {
-            resource_type: "image"
+            resource_type: resourceType
         });
         
         return result;
