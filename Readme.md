@@ -1,3 +1,3 @@
 # Youtube Clone
 
-This is my first MERN App
+Backend of youtube clone named MPEG-Viewer
