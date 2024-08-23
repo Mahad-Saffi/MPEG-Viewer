@@ -6,7 +6,27 @@ import asyncHandler from "../utils/asyncHandler.js"
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params
-    //TODO: toggle like on video
+    
+    if (!videoId) {
+        throw new ApiError(400, "Video id is required")
+    }
+
+    const like = {
+        likedBy: req.user?._id,
+        video: videoId,
+    }
+
+    const createdLike = await Like.create(like)
+
+    if (!createdLike) {
+        throw new ApiError(500, "Something went wrong while created new like")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, createdLike, "Like created successfully")
+    )
 })
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
