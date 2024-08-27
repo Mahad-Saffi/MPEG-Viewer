@@ -12,15 +12,84 @@ const getVideoComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
+    const {videoId} = req.params
+    const content = req.body
+    const userId = req.user?._id
+
+    if (!videoId || !content) {
+        throw new ApiError(400, "Video Id and content is required")
+    }
+
+    const comment = await Comment.create({
+        content: content,
+        video: videoId,
+        owner: userId
+    })
+
+    if (!comment) {
+        throw new ApiError(500, "Somthing went wrong while creating comment")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, comment, "Comment added successfully")
+    )
+
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
+    const {commentId} = req.params
+
+    if (!commentId) {
+        throw new ApiError(400, "Comment id is required")
+    }
+
+    const content = req.body
+
+    if (!content) {
+        throw new ApiError(400, "Content is required")
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(
+        commentId,
+        {
+            content: content
+        },
+        {
+            new: true
+        }
+    )
+
+    if (!updateComment) {
+        throw new ApiError(500, "Something went wrong while updating the comment")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, updateComment, "Comment updated successfully")
+    )
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
+    const {commentId} = req.params
+
+    if (!commentId) {
+        throw new ApiError(400, "Comment id is required")
+    }
+
+    const comment = await Comment.findByIdAndDelete(commentId)
+
+    if (!comment) {
+        throw new ApiError(500, "Something went wrong while deleting the comment")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, updateComment, "Comment deleted successfully")
+    )
 })
 
 export {
