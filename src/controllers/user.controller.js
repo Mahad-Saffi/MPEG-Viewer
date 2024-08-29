@@ -86,15 +86,8 @@ const registerUser = asyncHandler( async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-    // Get data
-    // check username or email
-    // check password
-    // autheticate username
-    // authenticate password
-    // acess and refresh token
-    // send cookie
 
-    const {fullname, username, password, email} = req.body;
+    const {username, password, email} = req.body;
 
     
     if (!(username || email)){
@@ -106,9 +99,8 @@ const loginUser = asyncHandler(async (req, res) => {
     }
     
     
-    // Find user from username or email
     const user = await User.findOne({
-        $or: [{"username": username},{"email": email}] //Problem is here
+        $or: [{"username": username},{"email": email}]
     })
 
     if (!user) {
@@ -270,10 +262,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         throw new (400, "Avatar path is missing")
     }
     
-    //uploading new file on cloudinary
     const avatar = await uploadOnCloudinary(avatarPath);
 
-    //deleting file from cloudinary
     const isFileDeleted = await deleteFromCloudinary(req.user?.avatar, "image")
     if (isFileDeleted.result !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
@@ -312,10 +302,8 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         throw new (400, "Avatar path is missing")
     }
 
-    //uploading new file on cloudinary
     const coverImage = await uploadOnCloudinary(coverImagePath);
 
-     //deleting file from cloudinary
      const isFileDeleted = await deleteFromCloudinary(req.user?.coverImage, "image")
      if (isFileDeleted.result !== "ok") throw new ApiError(500, "Something went wrong while deleting file from cloudinary")
 
