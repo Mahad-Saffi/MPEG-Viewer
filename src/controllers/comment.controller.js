@@ -30,7 +30,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
     const {videoId} = req.params
-    const content = req.body
+    const {content} = req.body
     const userId = req.user?._id
 
     if (!videoId || !content) {
@@ -62,7 +62,7 @@ const updateComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Comment id is required")
     }
 
-    const content = req.body
+    const {content} = req.body
 
     if (!content) {
         throw new ApiError(400, "Content is required")
@@ -78,14 +78,14 @@ const updateComment = asyncHandler(async (req, res) => {
         }
     )
 
-    if (!updateComment) {
+    if (!updatedComment) {
         throw new ApiError(500, "Something went wrong while updating the comment")
     }
 
     return res
     .status(200)
     .json(
-        new ApiResponse(200, updateComment, "Comment updated successfully")
+        new ApiResponse(200, updatedComment, "Comment updated successfully")
     )
 })
 
