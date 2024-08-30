@@ -8,7 +8,7 @@ import asyncHandler from "../utils/asyncHandler.js"
 
 const getChannelStats = asyncHandler(async (req, res) => {
 
-    const { userId } = req.user?._id
+    const userId = req.user?._id
 
     if (!userId) {
         throw new ApiError(400, "User id is required")
@@ -50,7 +50,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
 const getChannelVideos = asyncHandler(async (req, res) => {
 
-    const { userId } = req.user?._id
+    const userId = req.user?._id
 
     if (!userId) {
         throw new ApiError(400, "User id is required")
